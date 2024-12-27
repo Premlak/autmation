@@ -17,7 +17,7 @@ const scrapeLogic = async (res) => {
   });
   const page = await browser.newPage();
   while (true) {
-          await page.goto(url, { waitUntil: "load" });
+          await page.goto('https://isyllabi.com', { waitUntil: "load" });
       console.log("At Isyllabi");
       const iframeElement = await page.waitForSelector("iframe");
       const iframe = await iframeElement.contentFrame();
