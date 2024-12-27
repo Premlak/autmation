@@ -1,48 +1,46 @@
-const puppeteer = require("puppeteer");
+const { chromium } = require("playwright");
 
-(async () => {
-  const url = "https://isyllabi.com";
-
-  // Launch browser
-  const browser = await puppeteer.launch({
-    headless: true, 
-    defaultViewport: null,
-  });
-
+async function performAutomation() {
   while (true) {
-    const page = await browser.newPage(); 
     try {
-      console.log("Navigating to the main page...");
-      await page.goto(url, { waitUntil: "load" });
+      console.log("Starting automation cycle...");
 
-      console.log("Waiting for the iframe...");
-      const iframeElement = await page.waitForSelector("iframe");
+      // Launch browser
+      const browser = await chromium.launch({
+        headless: true,
+        args: ["--no-sandbox", "--disable-setuid-sandbox"],
+      });
 
-      console.log("Accessing the iframe...");
-      const iframe = await iframeElement.contentFrame();
+      const page = await browser.newPage();
 
-      if (!iframe) {
-        throw new Error("Failed to access the iframe.");
+      // Step 1: Navigate to the page
+      await page.goto("https://isyllabi.com", { waitUntil: "domcontentloaded" });
+      console.log("Page loaded.");
+
+      // Step 2: Locate the first iframe
+      const iframeElement = await page
+        .locator('iframe[name="1431150"]') // Specifically targets the first iframe by name
+        .first()
+        .contentFrame();
+
+      if (!iframeElement) {
+        throw new Error("Iframe not found or could not be accessed.");
       }
 
-      console.log("Looking for the clickable div inside iframe...");
-      const clickableDiv = await iframe.waitForSelector("body div");
+      console.log("Iframe located.");
 
-      console.log("Clicking the div...");
-      await clickableDiv.click();
-      setTimeout(() => {
-      console.log("Redirecting to the new page...");
-        
-      }, 2000);
-      // After redirection, immediately close the page
-      
-    } catch (err) {
-      console.error("Error encountered:", err.message);
-    } finally {
-      console.log("Closing the page and restarting...");
-      await page.close(); // Close the page to start the process again
+      // Step 3: Click the div inside the iframe's body
+      await iframeElement.locator("body div").first().click();
+      await page.waitForTimeout(1000);
+      console.log("Clicked button, redirecting to new page...");
+
+      // Step 4: Restart the process without waiting for the new page to load fully
+      console.log("Restarting the cycle...");
+      await browser.close();
+    } catch (error) {
+      console.error("Error during automation cycle:", error);
     }
   }
+}
 
-  // Note: Browser will keep running until you manually stop the script
-})();
+performAutomation();
