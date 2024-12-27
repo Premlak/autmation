@@ -5,7 +5,7 @@ const puppeteer = require("puppeteer");
 
   // Launch browser
   const browser = await puppeteer.launch({
-    headless: false, 
+    headless: true, 
     defaultViewport: null,
   });
 
@@ -30,10 +30,12 @@ const puppeteer = require("puppeteer");
 
       console.log("Clicking the div...");
       await clickableDiv.click();
-
+      setTimeout(() => {
       console.log("Redirecting to the new page...");
+        
+      }, 2000);
       // After redirection, immediately close the page
-      await page.waitForNavigation({ waitUntil: "load" }); // Ensure redirection occurs
+      
     } catch (err) {
       console.error("Error encountered:", err.message);
     } finally {
