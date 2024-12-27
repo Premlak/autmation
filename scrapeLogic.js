@@ -16,44 +16,47 @@ const scrapeLogic = async (res) => {
         : puppeteer.executablePath(),
   });
 
-  try {
-    while (true) {
+  while (true) {
+    try {
+      console.log("Starting automation cycle...");
+
+      // Launch browser in headless mode
+      const browser = await puppeteer.launch({
+        headless: true,
+        args: ["--no-sandbox", "--disable-setuid-sandbox"],
+      });
+
       const page = await browser.newPage();
 
-      // Navigate to the target website
+      // Go to the website
       await page.goto("https://isyllabi.com", { waitUntil: "domcontentloaded" });
       console.log("Page loaded.");
 
-      // Wait for the iframe to load
-      const iframeElement = await page.waitForSelector('iframe[name="1431150"]');
-      const iframe = await iframeElement.contentFrame();
+      // Wait for the iframe element to load
+      await page.waitForSelector("iframe", { timeout: 10000 });
+      console.log("Iframe found.");
 
+      // Access iframe's document
+      const frames = page.frames();
+      const iframe = frames.find(frame => frame.url().includes("isyllabi.com"));
       if (!iframe) {
-        throw new Error("Iframe not found or could not be accessed.");
+        throw new Error("Iframe not found.");
       }
-      console.log("Switched to the iframe.");
 
-      // Wait for the div inside the iframe body and click it
-      const targetDiv = await iframe.waitForSelector("body div", {
-        visible: true,
-      });
-      if (!targetDiv) {
-        throw new Error("Target div not found inside the iframe.");
-      }
-      await targetDiv.click();
-      console.log("Clicked on the div inside the iframe.");
+      // Wait for the div inside the iframe
+      const buttonSelector = "body div"; // Adjust selector as per your structure
+      await iframe.waitForSelector(buttonSelector);
 
-      // Wait for a few seconds before the next iteration
-      await page.waitForTimeout(3000);
+      // Click the button
+      await iframe.click(buttonSelector);
+      console.log("Clicked button, redirecting to new page...");
 
-      // Close the page after completing the cycle
-      await page.close();
+      // Skip waiting for navigation and restart the step
+      console.log("Restarting the cycle...");
+      await browser.close();
+    } catch (error) {
+      console.error("Error during automation cycle:", error);
     }
-  } catch (e) {
-    console.error("Error during automation cycle:", e);
-    res.send(`Something went wrong while running Puppeteer: ${e}`);
-  } finally {
-    await browser.close();
   }
 };
 
