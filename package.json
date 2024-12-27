@@ -1,18 +1,18 @@
 {
-  "name": "puppeteer-automation",
+  "name": "puppeteer-render",
   "version": "1.0.0",
-  "description": "Automation script for infinite execution with Puppeteer",
-  "main": "automation.js",
+  "description": "",
+  "main": "index.js",
   "scripts": {
-    "start": "node automation.js",
-    "build": "npm install && npm run build"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index"
   },
-  "dependencies": {
-    "puppeteer": "23.11.1" 
-  },
-  "engines": {
-    "node": ">=16.0.0"
-  },
+  "keywords": [],
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "puppeteer": "^19.7.2"
+  }
 }
