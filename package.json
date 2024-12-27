@@ -1,0 +1,17 @@
+{
+  "name": "puppeteer-automation",
+  "version": "1.0.0",
+  "description": "Automation script for infinite execution with Puppeteer",
+  "main": "automation.js",
+  "scripts": {
+    "start": "node automation.js"
+  },
+  "dependencies": {
+    "puppeteer": "^21.3.8"  // Latest version of Puppeteer
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "author": "",
+  "license": "ISC"
+}
