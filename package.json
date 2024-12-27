@@ -1,12 +1,17 @@
 {
-  "name": "automation-script",
+  "name": "puppeteer-automation",
   "version": "1.0.0",
-  "description": "Automated script using Playwright for infinite loop automation",
+  "description": "Automation script for infinite execution with Puppeteer",
   "main": "automation.js",
   "scripts": {
-    "start": "npx playwright install && node automation.js"
+    "start": "node automation.js"
   },
   "dependencies": {
-    "playwright": "^1.37.0"
-  }
+    "puppeteer": "23.11.1" 
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "author": "",
+  "license": "ISC"
 }
