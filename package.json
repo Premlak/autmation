@@ -5,7 +5,6 @@
   "main": "automation.js",
   "scripts": {
     "start": "npx playwright install && node automation.js",
-    "postinstall": "npx playwright install chromium"
   },
   "dependencies": {
     "playwright": "^1.37.0"
