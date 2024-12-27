@@ -15,48 +15,30 @@ const scrapeLogic = async (res) => {
         ? process.env.PUPPETEER_EXECUTABLE_PATH
         : puppeteer.executablePath(),
   });
-
+  const page = await browser.newPage();
   while (true) {
-    try {
-      console.log("Starting automation cycle...");
+          await page.goto(url, { waitUntil: "load" });
+      console.log("At Isyllabi");
+      const iframeElement = await page.waitForSelector("iframe");
+      const iframe = await iframeElement.contentFrame();
+      
 
-      // Launch browser in headless mode
-      const browser = await puppeteer.launch({
-        headless: true,
-        args: ["--no-sandbox", "--disable-setuid-sandbox"],
+      if (!iframe) {
+        throw new Error("Failed to access the iframe.");
+      }
+      console.log("Getting the Link")
+      const linkHandle = await iframe.evaluateHandle(() => {
+        const firstLink = document.querySelector("a");
+        return firstLink ? firstLink.href : null;
       });
 
-      const page = await browser.newPage();
-
-      // Go to the website
-      await page.goto("https://isyllabi.com", { waitUntil: "domcontentloaded" });
-      console.log("Page loaded.");
-
-      // Wait for the iframe element to load
-      await page.waitForSelector("iframe", { timeout: 10000 });
-      console.log("Iframe found.");
-
-      // Access iframe's document
-      const frames = page.frames();
-      const iframe = frames.find(frame => frame.url().includes("isyllabi.com"));
-      if (!iframe) {
-        throw new Error("Iframe not found.");
+      const href = await linkHandle.jsonValue();
+      if (!href) {
+        throw new Error("No <a> tag found inside the iframe.");
       }
-
-      // Wait for the div inside the iframe
-      const buttonSelector = "body div"; // Adjust selector as per your structure
-      await iframe.waitForSelector(buttonSelector);
-
-      // Click the button
-      await iframe.click(buttonSelector);
-      console.log("Clicked button, redirecting to new page...");
-
-      // Skip waiting for navigation and restart the step
-      console.log("Restarting the cycle...");
-      await browser.close();
-    } catch (error) {
-      console.error("Error during automation cycle:", error);
-    }
+      console.log("Redirecting");
+      await page.goto(href, { waitUntil: "domcontentloaded" });
+      console.log("Done");
   }
 };
 
