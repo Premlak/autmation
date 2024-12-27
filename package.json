@@ -4,7 +4,8 @@
   "description": "Automation script for infinite execution with Puppeteer",
   "main": "automation.js",
   "scripts": {
-    "start": "node automation.js"
+    "start": "node automation.js",
+    "build": "npm install && npm run build"
   },
   "dependencies": {
     "puppeteer": "23.11.1" 
