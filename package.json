@@ -4,7 +4,7 @@
   "description": "Automated script using Playwright for infinite loop automation",
   "main": "automation.js",
   "scripts": {
-    "start": "npx playwright install && node automation.js",
+    "start": "npx playwright install && node automation.js"
   },
   "dependencies": {
     "playwright": "^1.37.0"
