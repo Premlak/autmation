@@ -17,29 +17,35 @@ const scrapeLogic = async (res) => {
   });
   const page = await browser.newPage();
   while (true) {
-          await page.goto('https://isyllabi.com', { waitUntil: "load" });
+      await page.goto("https://isyllabi.com", { waitUntil: "networkidle2" }); // Wait for network to be mostly idle
       console.log("At Isyllabi");
-      const iframeElement = await page.waitForSelector("iframe");
+
+      // Ensure the iframe is available and loaded
+      const iframeElement = await page.waitForSelector("iframe", {
+        visible: true,
+        timeout: 10000, // Wait up to 10 seconds for the iframe to appear
+      });
+
       const iframe = await iframeElement.contentFrame();
-      
 
       if (!iframe) {
         throw new Error("Failed to access the iframe.");
       }
-      console.log("Getting the Link")
-      const linkHandle = await iframe.evaluateHandle(() => {
+
+      console.log("Getting the first <a> tag");
+      const href = await iframe.evaluate(() => {
         const firstLink = document.querySelector("a");
         return firstLink ? firstLink.href : null;
       });
 
-      const href = await linkHandle.jsonValue();
       if (!href) {
         throw new Error("No <a> tag found inside the iframe.");
       }
+
       console.log("Redirecting");
       await page.goto(href, { waitUntil: "domcontentloaded" });
       console.log("Done");
-  }
+    }
 };
 
 module.exports = { scrapeLogic };
