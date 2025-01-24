@@ -2,6 +2,7 @@ const puppeteer = require("puppeteer");
 let href = null;
 let state = false;
 let visited = 0;
+
 async function findFirstHrefInIframe(frame) {
   try {
     await frame.waitForFunction(() => document.readyState === "complete", { timeout: 10000 });
@@ -27,38 +28,49 @@ async function findFirstHrefInIframe(frame) {
   }
   return null;
 }
+
 async function updateHref(browser) {
   const page = await browser.newPage();
   while (true) {
     console.log("updater is called");
-    await page.goto("https://www.isyllabi.com", { waitUntil: "load" });
-    const allFrames = page.frames();
-    for (const frame of allFrames) {
-      if (frame !== page.mainFrame()) {
-        const foundHref = await findFirstHrefInIframe(frame);
-        if (foundHref) {
-          href = foundHref;  
-          console.log("Updated href:");
-          if(!state){
-            state = true;
-            visitHref(browser);
+    try {
+      await page.goto("https://www.isyllabi.com", { waitUntil: "load" });
+      const allFrames = page.frames();
+      for (const frame of allFrames) {
+        if (frame !== page.mainFrame()) {
+          const foundHref = await findFirstHrefInIframe(frame);
+          if (foundHref) {
+            href = foundHref;
+            console.log("Updated href:");
+            if (!state) {
+              state = true;
+              visitHref(browser);
+            }
           }
         }
       }
+    } catch (error) {
+      console.error("Error occurred:", error);
     }
   }
 }
+
 async function visitHref(browser) {
   console.log("visitor is called");
   const page = await browser.newPage();
   while (true) {
-    if(href){
+    if (href) {
+      try {
         await page.goto(href, { waitUntil: "domcontentloaded" });
         visited++;
         console.log("Visited Time = ", visited);
+      } catch (error) {
+        console.error("Error visiting href:", error);
+      }
     }
   }
 }
+
 async function main() {
   const browser = await puppeteer.launch({
     headless: false,
@@ -66,4 +78,5 @@ async function main() {
   });
   await updateHref(browser);
 }
+
 main();
